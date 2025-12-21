@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+
+# Conda / installers
+Miniconda3-latest-MacOSX-arm64.sh
+
+# Local test files
+*.xyz
+
+# OS junk
+.DS_Store
