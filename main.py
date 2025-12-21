@@ -86,7 +86,9 @@ class dispML:
 
         # self.features.append(charge)
         self.features = self.features + fpgen.getfingerprint(monomer_a, monomer_b, model)
-        self.corr = mlmodel.predict([self.features])[0]
+        # self.corr = mlmodel.predict([self.features])[0]
+        # don’t reject the input just because the feature names don’t match what the model stored
+        self.corr = mlmodel.predict([self.features], validate_features=False)[0]
         self.disp = self.eint + self.corr
 
 def main():
