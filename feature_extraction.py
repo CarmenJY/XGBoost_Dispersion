@@ -172,8 +172,8 @@ def extract_features(xyz_path: str) -> Dict[str, float]:
     zn_i = zn_indices[0]
     Zn = atoms[zn_i].pos() #--> z position
     #add H position here
-    H_position = [a.pos() for a in atoms if a.sym == "H"]
-    zn_h
+    # H_position = [a.pos() for a in atoms if a.sym == "H"]
+    # zn_h
 
     waters = assign_waters(atoms)
     n_waters = len(waters)
