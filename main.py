@@ -38,15 +38,15 @@ class dispML:
     """
     def __init__(self, monomer_a, monomer_b, model, quantum_features=None, e6=None, e8=None):
         """
-           Calculate dispersion energy between 2 monomers from a baseline method (D3 or MBD) + ML correction
-           :param monomer_a: RDKit mol object: RDKit mol object of the first monomer.
-           :param monomer_b: RDKit mol object: RDKit mol object of the second monomer.
-           :param model: str: 'D3-ML', 'D3-ML-S', 'D3-ML-X', 'MBD-ML-S' or 'MBD-ML-X'.
-           :param charge: int: total dimer charge.
-           :param quantum_features: list: list of 5 floats, [elst, exch, ind, exchind, |homo_a - homo_b|.
-           :param e6: float: if using MBD as baseline, MBD@rsSCS component of MBD dispersion energy.
-           :param e8: float: if using MBD as baseline, MBD@esDQ component of MBD dispersion energy.
-           """
+        Calculate dispersion energy between 2 monomers from a baseline method (D3 or MBD) + ML correction
+        :param monomer_a: RDKit mol object: RDKit mol object of the first monomer.
+        :param monomer_b: RDKit mol object: RDKit mol object of the second monomer.
+        :param model: str: 'D3-ML', 'D3-ML-S', 'D3-ML-X', 'MBD-ML-S' or 'MBD-ML-X'.
+        :param charge: int: total dimer charge.
+        :param quantum_features: list: list of 5 floats, [elst, exch, ind, exchind, |homo_a - homo_b|.
+        :param e6: float: if using MBD as baseline, MBD@rsSCS component of MBD dispersion energy.
+        :param e8: float: if using MBD as baseline, MBD@esDQ component of MBD dispersion energy.
+        """
         if 'MBD' in model:
             if e6 is None or e8 is None:
                 raise TypeError('Must provide MBD@rsSCS and MBD@esDQ if using MBD based models.')
@@ -72,10 +72,10 @@ class dispML:
 
 
         models = {'D3-ML': PATH + '/ml_models/opt-D3-emp.json',
-                  'D3-S-ML': PATH + '/ml_models/opt-D3-sapt.json',
-                  'D3-X-ML': PATH + '/ml_models/opt-D3-xsapt.json',
-                  'MBD-S-ML': PATH + '/ml_models/mbd-opt-sapt.json',
-                  'MBD-X-ML': PATH + '/ml_models/mbd-opt-xsapt.json'}
+                'D3-S-ML': PATH + '/ml_models/opt-D3-sapt.json',
+                'D3-X-ML': PATH + '/ml_models/opt-D3-xsapt.json',
+                'MBD-S-ML': PATH + '/ml_models/mbd-opt-sapt.json',
+                'MBD-X-ML': PATH + '/ml_models/mbd-opt-xsapt.json'}
 
         mlmodel = xgb.XGBRegressor()
         mlmodel.load_model(models[model])
