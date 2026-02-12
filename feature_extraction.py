@@ -2,7 +2,7 @@
 Feature extraction for Zn2+ + (H2O)_n clusters (n=1..6).
 
 Input: XYZ file containing 1 Zn atom and n water molecules.
-Output: a small, physically motivated feature set for induction ML.
+Output: a small, physically motivated feature set for induction ML + C4 baseline.
 
 Usage:
 python feature_extraction.py path/to/cluster.xyz
@@ -17,6 +17,13 @@ import math
 import statistics
 from dataclasses import dataclass
 from typing import List, Tuple, Dict, Optional
+
+# Import C4 baseline
+try:
+    from baseline_c4 import C4Baseline
+except ImportError:
+    # If baseline_c4 is not in the same directory, provide a fallback
+    C4Baseline = None
 
 
 @dataclass
@@ -60,6 +67,16 @@ def read_xyz(path: str) -> List[Atom]:
         atoms.append(Atom(sym, x, y, z))
 
     return atoms
+
+
+def atoms_to_mol_dict(atoms: List[Atom]) -> Dict:
+    """Convert Atom list to baseline_c4 mol dict format."""
+    mol = {
+        'index': list(range(len(atoms))),
+        'atom': [a.sym for a in atoms],
+        'coordinates': [[a.x, a.y, a.z] for a in atoms]
+    }
+    return mol
 
 
 def unit(v: Tuple[float, float, float]) -> Tuple[float, float, float]:
@@ -163,17 +180,24 @@ def count_hbonds(atoms: List[Atom],
     return hb
 
 
-def extract_features(xyz_path: str) -> Dict[str, float]:
+def extract_features(xyz_path: str, compute_baseline: bool = True) -> Dict[str, float]:
+    """
+    Extract features and optionally compute C4 baseline.
+    
+    Args:
+        xyz_path: Path to XYZ file
+        compute_baseline: If True, compute and include E_baseline_C4
+    
+    Returns:
+        Dictionary of features (and baseline if requested)
+    """
     atoms = read_xyz(xyz_path)
 
     zn_indices = [i for i, a in enumerate(atoms) if a.sym.lower() == "zn"]
     if len(zn_indices) != 1:
         raise ValueError(f"Expected exactly 1 Zn atom, found {len(zn_indices)}.")
     zn_i = zn_indices[0]
-    Zn = atoms[zn_i].pos() #--> z position
-    #add H position here
-    # H_position = [a.pos() for a in atoms if a.sym == "H"]
-    # zn_h
+    Zn = atoms[zn_i].pos()
 
     waters = assign_waters(atoms)
     n_waters = len(waters)
@@ -240,6 +264,22 @@ def extract_features(xyz_path: str) -> Dict[str, float]:
         "HB_count": float(hb_count),
     }
 
+    # Compute C4 baseline if requested and available
+    if compute_baseline and C4Baseline is not None:
+        try:
+            mol_dict = atoms_to_mol_dict(atoms)
+            baseline = C4Baseline(mol_dict, C4=1.0, kcal=True, pairwise=False)
+            feats["E_baseline_C4"] = baseline.get_energy()
+        except Exception as e:
+            # If baseline computation fails, set to NaN and continue
+            feats["E_baseline_C4"] = float("nan")
+            import sys
+            print(f"Warning: Could not compute baseline for {xyz_path}: {e}", file=sys.stderr)
+    elif compute_baseline and C4Baseline is None:
+        feats["E_baseline_C4"] = float("nan")
+        import sys
+        print("Warning: baseline_c4 module not found, E_baseline_C4 set to NaN", file=sys.stderr)
+
     return feats
 
 
@@ -248,9 +288,11 @@ def main():
     ap.add_argument("xyz", help="XYZ file with Zn and (H2O)_n cluster")
     ap.add_argument("--json", action="store_true", help="Print as JSON")
     ap.add_argument("--csv", action="store_true", help="Print as one-line CSV (header + value)")
+    ap.add_argument("--no-baseline", action="store_true", help="Skip baseline computation")
     args = ap.parse_args()
 
-    feats = extract_features(args.xyz)
+    compute_baseline = not args.no_baseline
+    feats = extract_features(args.xyz, compute_baseline=compute_baseline)
 
     if args.json:
         print(json.dumps(feats, indent=2, sort_keys=True))
