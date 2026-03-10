@@ -1,0 +1,14 @@
+ZnO_min
+ZnO_mean
+ZnO_max
+ZnO_std
+mean_invR2
+mean_invR3
+mean_invR4
+coord_ZnO_le_2p3
+coord_ZnO_le_2p5
+coord_ZnO_le_3p0
+OO_mean
+OO_min
+OO_std
+HB_count
