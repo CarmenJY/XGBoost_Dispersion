@@ -1,0 +1,7 @@
+RMSE COMPARISON TABLE
+======================================================================
+
+| Whose RMSE | Training set | Valid set | Test set |
+|------------|--------------|-----------|----------|
+| Between MM and QM | 6.062 | 6.429 | 6.140 |
+| Between MM+ΔML and QM | 0.021 | 1.591 | 1.568 |
