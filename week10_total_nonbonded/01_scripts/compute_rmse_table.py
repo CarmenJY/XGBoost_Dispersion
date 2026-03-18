@@ -110,7 +110,7 @@ print(f"  Test:  {rmse_mm_qm_test - rmse_final_test:.3f} kcal/mol ({(1 - rmse_fi
 
 print("\n" + "="*70)
 
-# Save for slides
+#input pic directly
 output_file = Path("week10_total_nonbonded/03_analysis/rmse_table.txt")
 with open(output_file, 'w') as f:
     f.write("RMSE COMPARISON TABLE\n")
